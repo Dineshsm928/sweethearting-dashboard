@@ -28,10 +28,11 @@ export async function POST(req: Request) {
     // Mark as approved
     data[itemIndex].status = 'approved';
     
-    // Upload modified JSON back to GCS
     await file.save(JSON.stringify(data, null, 2), {
-      contentType: 'application/json',
-      cacheControl: 'no-cache',
+      metadata: {
+        contentType: 'application/json',
+        cacheControl: 'no-cache',
+      }
     });
 
     return NextResponse.json({ 
