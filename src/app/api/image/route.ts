@@ -19,7 +19,7 @@ export async function GET(req: Request) {
     
     const [imageBuffer] = await file.download();
     
-    return new NextResponse(imageBuffer, {
+    return new NextResponse(imageBuffer as any, {
       headers: {
         'Content-Type': 'image/jpeg',
         'Cache-Control': 'public, max-age=31536000, immutable',
