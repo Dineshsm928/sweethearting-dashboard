@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, Suspense } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { Check, X, Database } from 'lucide-react';
 
 interface PendingItem {
@@ -14,18 +15,22 @@ interface PendingItem {
   }
 }
 
-export default function Dashboard() {
+function DashboardContent() {
+  const searchParams = useSearchParams();
+  const dateParam = searchParams.get('date') || '';
+  
   const [items, setItems] = useState<PendingItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [processingId, setProcessingId] = useState<number | null>(null);
 
   useEffect(() => {
-    fetchItems();
-  }, []);
+    fetchItems(dateParam);
+  }, [dateParam]);
 
-  const fetchItems = async () => {
+  const fetchItems = async (date: string) => {
     try {
-      const res = await fetch('/api/pending');
+      const url = date ? `/api/pending?date=${date}` : '/api/pending';
+      const res = await fetch(url);
       const data = await res.json();
       setItems(data.items || []);
     } catch (err) {
@@ -149,5 +154,13 @@ export default function Dashboard() {
         </div>
       )}
     </div>
+  );
+}
+
+export default function Dashboard() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-slate-950 flex items-center justify-center"><div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div></div>}>
+      <DashboardContent />
+    </Suspense>
   );
 }
